@@ -8,7 +8,7 @@ function showFPS() {
 function module(stdlib, ffi, heap){
     "use asm";
     var pixels = new stdlib.Uint8Array(heap);
-
+    
     function xs32(x) {
         x = x|0;
         x = ((x|0) ^ (((x|0) >> (13|0))|0))|0;
