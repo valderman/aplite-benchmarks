@@ -1,10 +1,13 @@
+{-# LANGUAGE CPP #-}
 import Prelude hiding (break)
 import Haste.Aplite
+import Haste
+import Haste.Performance
 
 type Length = Word32
 
 factors :: Double -> IOUArray Word32 Double -> IO ()
-factors = aplite asmjsTuning facs
+factors = aplite TUNING facs
 
 facs :: CExp Double -> Arr Word32 Double -> Aplite ()
 facs num fs = do
@@ -47,7 +50,10 @@ facs num fs = do
 main = do
   arr <- newArray (0, 10) 0
   factors big arr
+  t <- now
   factors big arr
+  t' <- now
   getElems arr >>= print
+  print (t'-t)
 
 big = 5467154436746477

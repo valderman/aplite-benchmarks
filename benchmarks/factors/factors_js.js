@@ -1,3 +1,4 @@
+// slower reference implementation
 function primeFactorization(num){
   var root = Math.sqrt(num),  
   result = arguments[1] || [],  //get unnamed paremeter from recursive calls
@@ -46,6 +47,12 @@ function f(num){
     }
 }
 
+window.onload = function() {
+    var t1 = new Date().getTime();
+    var res = f(big);
+    var t2 = new Date().getTime();
+    console.log(res);
+    console.log(t2-t1);
+}
+
 var big = 5467154436746477;
-console.log(f(big));
-console.log(f(big));
