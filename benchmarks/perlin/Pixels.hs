@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, MagicHash, UnboxedTuples #-}
+{-# LANGUAGE CPP, OverloadedStrings, MagicHash, UnboxedTuples #-}
 module Pixels (
     Pixels,
     PixelColor,
@@ -47,15 +47,24 @@ fromColor (RGB r g b) =
                                            .|. 0xff000000
 
 
+#ifdef __HASTE__
 -- | Convert a pixel color back into a canvas 'Color'.
 {-# INLINE toColor #-}
 toColor :: PixelColor -> Color
-toColor (PixelColor (W32# w)) = RGBA r g b (a*255)
+toColor (PixelColor (W32# w)) = RGBA r g b (a/255)
   where
     r = I# (unsafeCoerce# (and# w 0xff##))
     g = I# (unsafeCoerce# (and# (uncheckedShiftRL# w 8#) 0xff##))
     b = I# (unsafeCoerce# (and# (uncheckedShiftRL# w 16#) 0xff##))
-    a = D# (unsafeCoerce# (and# (uncheckedShiftRL# w 32#) 0xff##))
+    a = D# (unsafeCoerce# (and# (uncheckedShiftRL# w 24#) 0xff##))
+#else
+toColor (PixelColor w) = RGBA r g b (a / 255)
+  where
+    r = fromIntegral $ w .&. 0xff
+    g = fromIntegral $ (w `shiftR` 8)  .&. 0xff
+    b = fromIntegral $ (w `shiftR` 16) .&. 0xff
+    a = fromIntegral $ (w `shiftR` 24) .&. 0xff
+#endif
 
 type ImageData = JSAny
 type RawByteArray = JSAny

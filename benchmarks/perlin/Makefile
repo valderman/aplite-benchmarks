@@ -11,7 +11,7 @@ haskell: perlin.hs Pixels.hs perlin.html
 	cpp -P -DJSFILE=perlin_hs.js perlin.html -o perlin_hs.html
 
 aplite: perlin_aplite.hs Pixels.hs perlin.html
-	hastec perlin_aplite.hs -o perlin_aplite.js
+	hastec perlin_aplite.hs -o perlin_aplite.js --opt-all
 	cpp -P -DJSFILE=perlin_aplite.js perlin.html -o perlin_aplite.html
 
 js: perlin_js.js perlin.html
