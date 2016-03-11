@@ -70,6 +70,9 @@ function perlin(octavehash, x, y) {
     var resetbtn = document.getElementById('reset');
     stopbtn.addEventListener('click', stop);
     resetbtn.addEventListener('click', restart);
+    e = document.getElementById("can");
+    c = e.getContext("2d");
+    imgdata = c.createImageData(len, 200);
     restart();
 };
 
@@ -81,21 +84,13 @@ function stop() {
 
 function restart() {
     keep_going = true;
-    paint(0, 200);
+    paint(0);
 }
 
-function paint(off, len) {
-    var e = document.getElementById("can");
-    var c = e.getContext("2d");
-/*    c.clearRect(0, 0, e.width, e.height);
-    c.beginPath();
-    c.moveTo(0, noise(1, 0, off/50)*50+100);
-    for(var x = 1; x <= len; ++x) {
-        c.lineTo(x, noise(1, 0, (off+x)/50)*50+100);
-    }
-    c.stroke();
-*/
-    var imgdata = c.createImageData(len, 200);
+var len = 200;
+var e, c, imagedata;
+
+function paint(off) {
     var pixels = new Int32Array(imgdata.data.buffer), nbytes = len*200*4;
     var pixels2 = new Int32Array(new ArrayBuffer(pixels.byteLength)), nbytes = len*200*4;
     var pixelbytes = imgdata.data;
@@ -107,16 +102,11 @@ function paint(off, len) {
             pixelbytes[px*4+3] = 128-255*val;
         }
     }
-    for(var i = 0; i < pixels.length; ++i) {
-        if(pixels[i] != pixels2[i]) {
-            throw 'OH NOES: ' + pixels[i] + ' /= ' + pixels2[i] + ' at off ' + off + ', pixel ' + i;
-        }
-    }
     c.putImageData(imgdata, 0, 0);
     ++frames;
 
     if(keep_going) {
-        window.requestAnimationFrame(function() {paint(off+3, len);});
+        window.setTimeout(function() {paint(off+3, len);},1);
     }
 }
 

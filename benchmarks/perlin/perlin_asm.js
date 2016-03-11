@@ -144,22 +144,28 @@ function stop() {
     keep_going = false;
 }
 
+var len = 200;
+var e;
+var c;
+var imgdata;
+
 window.onload = function() {
-    var e = document.getElementById("can");
-    var c = e.getContext("2d");
-    var imgdata = c.createImageData(1024, 256);
+    e = document.getElementById("can");
+    c = e.getContext("2d");
+    imgdata = c.createImageData(1024, 256);
+
     var b = imgdata.data.buffer;
     var m = module(window, null, b);
     var stopbtn = document.getElementById('stop');
     var resetbtn = document.getElementById('reset');
 
-    function paint(off, len) {
-        m.clouds(off, 200);
+    function paint(off) {
+        m.clouds(off, len);
         c.putImageData(imgdata, 0, 0);
         ++frames;
 
         if(keep_going) {
-            window.requestAnimationFrame(function() {paint(off+3, len);});
+            window.setTimeout(function() {paint(off+3);},1);
         }
     }
 

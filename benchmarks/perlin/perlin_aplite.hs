@@ -92,27 +92,6 @@ perlin octhash x y = do
 decimalPart :: CExp Double -> CExp Double
 decimalPart x = x - floor_ x
 
-{- completely unrolled
-perlinOct :: Int32
-          -> Double
-          -> Double
-          -> Double
-          -> Double
-perlinOct octaves p =
-  aplite defaultTuning $ \x y -> do
-    let go :: Int32 -> Double -> Double
-           -> CExp Double -> CExp Double
-           -> Aplite Double
-        go !oct !f !amp !tot !max_
-          | oct <= octaves = do
-              let amp' = realToFrac amp :: CExp Double
-                  f'   = realToFrac f :: CExp Double
-              octhash <- xs32 (fromIntegral oct)
-              val <- perlin octhash (x*f') (y*f')
-              go (oct+1) (f*2) (amp*p) (tot+val*amp') (max_+amp')
-          | otherwise      = pure (tot / max_)
-    go 1 1 1 0 0
--}
 perlinOct :: CExp Int32
           -> CExp Double
           -> CExp Double
@@ -138,8 +117,6 @@ perlinOct octaves p x y = do
     max_ <- getRef rmax
     return (tot/max_)
 
-theTuning = asmjsTuning {explicitHeap = Just 0x100000}
-
 runPerlin :: CExp Int32
           -> CExp Double
           -> CExp Int32
@@ -152,27 +129,14 @@ runPerlin octaves p w h = aplite theTuning $ ppp octaves p w h
 goPerlinGo :: Int32 -> IOUArray Int32 Word32 -> IO ()
 goPerlinGo = runPerlin 4 0.5 200 200
 
-paint :: Canvas -> Int32 -> IORef Bool -> IORef Double -> IO ()
-paint !can !off !ref !frames = do
+paint :: Canvas -> IOUArray Int32 Word32 -> ImageDataHandle -> Int32 -> IORef Bool -> IORef Double -> IO ()
+paint can pixels h off ref frames = do
   keepGoing <- readIORef ref
-  {-
-  let off' = fromIntegral off
-  let c = fromColor $ RGB 255 255 255
-  drawPixels can $ do
-    forM_ [0 .. fromIntegral len-1] $ \x -> do
-      forM_ [0 .. 199] $ \y -> do
-        let xf = fromIntegral x
-            yf = fromIntegral y
-            alpha = 0.5 - goPerlinGo ((off'+xf)/75) (yf/75)
-        setPixel (fromIntegral x) (fromIntegral y) c
-        setPixelAlpha (fromIntegral x) (fromIntegral y) (truncate (clamp alpha*255))
-  -}
-  (pixels, h) <- createImageData can 200 200
   goPerlinGo off pixels
   putImageData can h
   atomicModifyIORef' frames (\f -> (f+1, ()))
-  when keepGoing $ void $ requestAnimationFrame $ const $ do
-    paint can (off+3) ref frames
+  when keepGoing $ void $ setTimer (Once 1) $ do
+    paint can pixels h (off+3) ref frames
 
 putImageData :: Canvas -> ImageDataHandle -> IO ()
 putImageData = ffi "(function(c,d){c.getContext('2d').putImageData(d,0,0);})"
@@ -187,7 +151,7 @@ printP :: CExp Int32
        -> CExp Int32
        -> CExp Int32
        -> JSString
-printP octaves p w h = compile defaultTuning $ ppp octaves p w h
+printP octaves p w h = compile theTuning $ ppp octaves p w h
 
 ppp :: CExp Int32 -> CExp Double -> CExp Int32 -> CExp Int32 -> CExp Int32 -> Arr Int32 Word32 -> Aplite ()
 ppp octaves p w h offset pixels = do
@@ -203,7 +167,7 @@ ppp octaves p w h offset pixels = do
 
 -- arrTest :: Int32 -> Double
 arrTest :: IOUArray Int32 Double -> Int32 -> IO Double
-arrTest = aplite defaultTuning $ \a sz -> do
+arrTest = aplite theTuning $ \a sz -> do
   r <- initRef 0
   for (0, 1, Excl sz) $ \i -> do
     x <- getArr i a
@@ -212,19 +176,20 @@ arrTest = aplite defaultTuning $ \a sz -> do
   setArr 5 666 a
   getRef r
 
+theTuning = defaultTuning -- asmjsTuning {explicitHeap = Just 0x100000}
+
 main = do
-  e <- newElem "textarea" `with` ["textContent" =: printP 4 0.5 200 200]
-  appendChild documentBody e
   Just c <- getCanvasById "can"
   keepGoing <- newIORef True
   frames <- newIORef 0
+  (pixels, h) <- createImageData c 200 200
   withElems ["stop", "reset"] $ \[stop, reset] -> do
     reset `onEvent` Click $ const $ do
       writeIORef keepGoing True
-      paint c 0 keepGoing frames
+      paint c pixels h 0 keepGoing frames
     stop `onEvent` Click $ const (writeIORef keepGoing False)
   setTimer (Repeat 5000) $ do
     withElem "fps" $ \fps -> do
       f <- atomicModifyIORef' frames (\f -> (0, f/5))
       setProp fps "textContent" (S.append (toJSString f) " FPS")
-  paint c 0 keepGoing frames
+  paint c pixels h 0 keepGoing frames
