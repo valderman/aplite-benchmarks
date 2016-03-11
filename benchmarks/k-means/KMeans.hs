@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, CPP #-}
 module KMeans (kMeans, kMeans') where
 import Haste.Aplite
 
@@ -14,7 +14,7 @@ kMeans :: [Point]
        -> IO ()
 kMeans clusters = aplite tuning (kMeans' clusters)
 
-tuning = asmjsTuning {explicitHeap = Just 0x10000000}
+tuning = TUNING
 
 kMeans' :: [Point] -> CExp Word32 -> Arr Word32 Double -> Arr Word32 Word32 -> Aplite ()
 kMeans' clusters npoints points sizes = do

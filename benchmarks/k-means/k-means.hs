@@ -15,20 +15,28 @@ thepoints :: Seed -> Seed -> [Double]
 thepoints s1 s2 =
   concat $ zipWith (\a b -> [a, b]) (randomRs (0,250) s1) (randomRs (0,125) s2)
 
+prepKMeans clusters = do
+  sizes <- newArray (0,4) 0
+  pts <- newArray (0,1) 0
+  let km = kMeans clusters
+  km 1 pts sizes
+  return km
+
 main = flip catch (\(SomeException e) -> print e) $ do
   let s1 = mkSeed 123
       s2 = mkSeed 456
   points <- newListArray (0, size*2-1) (thepoints s1 s2)
-  indices <- newArray (0, 4) 0
+  sizes <- newArray (0, 4) 0
   let s3 = mkSeed 789
       s4 = mkSeed 101112
   let pts = take 5 $ zip [fromIntegral (r :: Int) | r <- randomRs (0,250) s1]
                          [fromIntegral (r :: Int) | r <- randomRs (0,125) s2]
+  km <- prepKMeans pts
   t <- now
-  kMeans pts size points indices
+  km size points sizes
   t' <- now
 --  pts <- mkPoints <$> getElems (points :: IOUArray Word32 Double)
-  ixs <- getElems (indices :: IOUArray Word32 Word32)
+  ixs <- getElems (sizes :: IOUArray Word32 Word32)
   print ixs
   print (t'-t)
 
