@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, BangPatterns, FlexibleInstances, OverloadedStrings, ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings, BangPatterns, FlexibleInstances, OverloadedStrings, ScopedTypeVariables, CPP #-}
 import Haste
 import Haste.DOM.JSString
 import Haste.Events
@@ -176,7 +176,7 @@ arrTest = aplite theTuning $ \a sz -> do
   setArr 5 666 a
   getRef r
 
-theTuning = defaultTuning -- asmjsTuning {explicitHeap = Just 0x100000}
+theTuning = TUNING
 
 main = do
   Just c <- getCanvasById "can"
