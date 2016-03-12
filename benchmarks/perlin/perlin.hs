@@ -3,7 +3,6 @@ import Haste
 import Haste.DOM.JSString
 import Haste.Events
 import Haste.Graphics.Canvas
-import Haste.Graphics.AnimationFrame
 import qualified Haste.JSString as S
 import Data.Bits
 import Data.Int
@@ -89,7 +88,7 @@ paint !can !off !len !ref !frames = do
         setPixel (fromIntegral x) y c
         setPixelAlpha (fromIntegral x) y (truncate (clamp alpha*255))
   atomicModifyIORef' frames (\f -> (f+1, ()))
-  when keepGoing $ void $ requestAnimationFrame $ const $ do
+  when keepGoing $ void $ setTimer (Once 1) $ do
     paint can (off+3) len ref frames
 
 main = do
