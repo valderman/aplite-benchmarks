@@ -17,7 +17,7 @@ signed_crc_table' :: Arr Int32 Int32 -> Aplite ()
 signed_crc_table' tbl = do
   for (0, 1, Excl 256) $ \i -> do
     c <- foldr (.) id (replicate 8 step) (pure i)
-    setArr i c tbl
+    setArr tbl i c
   where
     step :: Aplite (CExp Int32) -> Aplite (CExp Int32)
     step mc = mc >>= \c -> share =<< do
@@ -38,8 +38,8 @@ crc32 = aplite tuning $ \tbl len buf -> do
          -> CExp Int32
          -> Aplite (CExp Int32)
     step tbl buf i crc = do
-      x <- getArr i buf
-      x' <- getArr ((crc `xor` x) .&. 0xFF) tbl
+      x <- getArr buf i
+      x' <- getArr tbl ((crc `xor` x) .&. 0xFF)
       return $ (crc `shiftRL` 8) `xor` x'
 
 shiftRL' :: Int32 -> Int -> Int32
@@ -81,9 +81,9 @@ main = do
   tbl <- newArray_ (0,255)
   buf <- newArray_ (0, testlen-1)
   signed_crc_table tbl
---  x <- crc32 tbl testlen buf
+  x <- crc32 tbl testlen buf
   t <- now
-  x <- crc32hs tbl testlen buf
+  x <- crc32 tbl testlen buf
   t' <- now
   print x
   print (t'-t)

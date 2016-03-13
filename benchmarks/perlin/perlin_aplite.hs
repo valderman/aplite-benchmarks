@@ -163,17 +163,17 @@ ppp octaves p w h offset pixels = do
                    (return 0)
                    (ifE (alpha' #> 255) (return 255) (return alpha'))
       let color = 0xffffff .|. (f2n alpha'' `shiftL` 24)
-      setArr (y*w+x) color pixels
+      setArr pixels (y*w+x) color
 
 -- arrTest :: Int32 -> Double
 arrTest :: IOUArray Int32 Double -> Int32 -> IO Double
 arrTest = aplite theTuning $ \a sz -> do
   r <- initRef 0
   for (0, 1, Excl sz) $ \i -> do
-    x <- getArr i a
+    x <- getArr a i
     y <- getRef r
     setRef r (x+y)
-  setArr 5 666 a
+  setArr a 5 666
   getRef r
 
 theTuning = TUNING

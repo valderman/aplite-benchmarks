@@ -43,7 +43,7 @@ copyOutSizes cs arr = go (0 :: Int) cs
     go :: Int -> [Cluster] -> Aplite ()
     go !ix (c:cs) = do
       npts <- getRef (clusterNPts c)
-      setArr (fromIntegral ix) npts arr
+      setArr arr (fromIntegral ix) npts
       go (ix+1) cs
     go _ _ = do
       return ()
@@ -54,10 +54,10 @@ mkCluster maxpts mean = Cluster <$> newPtRef mean
                                 <*> initRef 0
 
 ptX :: Arr Word32 Double -> CExp Word32 -> Aplite (CExp Double)
-ptX pts i = getArr (i*2) pts
+ptX pts i = getArr pts (i*2)
 
 ptY :: Arr Word32 Double -> CExp Word32 -> Aplite (CExp Double)
-ptY pts i = getArr (i*2+1) pts
+ptY pts i = getArr pts (i*2+1)
 
 type Point = (CExp Double, CExp Double)
 type PointRef = (Ref Double, Ref Double)
@@ -131,8 +131,8 @@ setPt :: Arr Word32 Double
       -> (CExp Double, CExp Double)
       -> Aplite ()
 setPt arr ix (x, y) = do
-  setArr (ix*2) x arr
-  setArr (ix*2+1) y arr
+  setArr arr (ix*2) x
+  setArr arr (ix*2+1) y
 
 addPt :: Arr Word32 Double
       -> Ref Word32

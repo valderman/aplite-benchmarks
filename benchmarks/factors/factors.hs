@@ -31,7 +31,7 @@ facs num fs = do
     pushFactor fs ixr f = do
       ix <- getRef ixr
       setRef ixr (ix+1)
-      setArr ix f fs
+      setArr fs ix f
 
     iterateOdds :: CExp Double -> CExp Double -> Aplite (CExp Double)
     iterateOdds n root = do
