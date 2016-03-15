@@ -5,13 +5,11 @@ import Numeric
 
 tuning = TUNING
 
-type Index = CExp Word32
-type Length = Index
 type Array = Arr Index
 type CRCTable = IOUArray Int32 Int32
 
 signed_crc_table :: CRCTable -> IO ()
-signed_crc_table = aplite tuning signed_crc_table'
+signed_crc_table = apliteWith tuning signed_crc_table'
 
 signed_crc_table' :: Arr Int32 Int32 -> Aplite ()
 signed_crc_table' tbl = do
@@ -26,7 +24,7 @@ signed_crc_table' tbl = do
         (pure $ c `shiftRL` 1)
 
 crc32 :: CRCTable -> Int32 -> IOUArray Int32 Int32 -> IO Int32
-crc32 = aplite tuning $ \tbl len buf -> do
+crc32 = apliteWith tuning $ \tbl len buf -> do
   crc <- initRef (fromIntegral (-1))
   for (0, 1, Excl len) $ \i -> do
     getRef crc >>= step tbl buf i >>= setRef crc
@@ -81,9 +79,9 @@ main = do
   tbl <- newArray_ (0,255)
   buf <- newArray_ (0, testlen-1)
   signed_crc_table tbl
-  x <- crc32 tbl testlen buf
+  x <- crc32hs tbl testlen buf
   t <- now
-  x <- crc32 tbl testlen buf
+  x <- crc32hs tbl testlen buf
   t' <- now
   print x
   print (t'-t)

@@ -7,7 +7,7 @@ import Haste.Performance
 type Length = Word32
 
 factors :: Double -> IOUArray Word32 Double -> IO ()
-factors = aplite TUNING facs
+factors = apliteWith TUNING facs
 
 facs :: CExp Double -> Arr Word32 Double -> Aplite ()
 facs num fs = do

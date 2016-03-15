@@ -124,7 +124,7 @@ runPerlin :: CExp Int32
           -> Int32
           -> IOUArray Int32 Word32
           -> IO ()
-runPerlin octaves p w h = aplite theTuning $ ppp octaves p w h
+runPerlin octaves p w h = apliteWith theTuning $ ppp octaves p w h
 
 goPerlinGo :: Int32 -> IOUArray Int32 Word32 -> IO ()
 goPerlinGo = runPerlin 4 0.5 200 200
@@ -167,7 +167,7 @@ ppp octaves p w h offset pixels = do
 
 -- arrTest :: Int32 -> Double
 arrTest :: IOUArray Int32 Double -> Int32 -> IO Double
-arrTest = aplite theTuning $ \a sz -> do
+arrTest = apliteWith theTuning $ \a sz -> do
   r <- initRef 0
   for (0, 1, Excl sz) $ \i -> do
     x <- getArr a i

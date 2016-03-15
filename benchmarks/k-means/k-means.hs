@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Haste
-import Haste.DOM
+import Haste.DOM.JSString
 import Haste.Graphics.Canvas
 import KMeans
 import Data.Array.IO

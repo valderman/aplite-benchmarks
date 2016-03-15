@@ -12,7 +12,7 @@ kMeans :: [Point]
        -> IOUArray Word32 Double
        -> IOUArray Word32 Word32
        -> IO ()
-kMeans clusters = aplite tuning (kMeans' clusters)
+kMeans clusters = apliteWith tuning (kMeans' clusters)
 
 tuning = TUNING
 
