@@ -1,3 +1,6 @@
+// JavaScript CRC32 implementation courtesy of SheetJS, used under the Apache license.
+// https://github.com/SheetJS/js-crc32
+
 function signed_crc_table() {
     var c = 0, table = new Array(256);
 
