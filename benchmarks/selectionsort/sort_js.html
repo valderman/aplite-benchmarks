@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script src="sort_js.js"></script>
+    <script>
+      window.onload = function() {
+        var arr = new Array(size);
+        for(var i = 0; i < arr.length; ++i) {
+          arr[i] = Math.random()*200-100;
+        }
+        var t0 = new Date().getTime();
+        sort(arr);
+        var t1 = new Date().getTime();
+        console.log(t1-t0);
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
