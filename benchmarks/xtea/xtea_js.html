@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script src="xtea_js.js"></script>
+    <script>
+      window.onload = function() {
+        var buf = new Uint32Array(new ArrayBuffer(size*4));
+        var t0 = new Date().getTime();
+        enc_cbc(iv, key, buf, size, 2);
+        var t1 = new Date().getTime();
+        console.log(t1-t0);
+        console.log(buf[size-1]);
+
+        var b = new Uint32Array(new ArrayBuffer(8));
+        encrypt(b, 0, key);
+        console.log(b);
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
