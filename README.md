@@ -1,7 +1,7 @@
 Aplite benchmarks
 =================
 
-This repository contains benchmarks for the ICFP '16 submission
-"High-performance functional web applications through EDSLs".
+This repository contains benchmarks for the Haskell Symposium '16 submission
+"High-performance client-side web applications through Haskell EDSLs".
 
 Apologies for the embarrassingly messy code!
